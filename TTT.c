@@ -18,11 +18,11 @@ void setChar_of_Player(int player);
 int game_status(int field[]);
 int int_elements_equal(int x, int y , int z);
 void update_char_field(int field[]);
-void showField(char field[]);
+void showField(int field[]);
 int getMove(int currentPlayer);
 int is_move_legal(int field[], int move);
 void doMove(int move,int  currentPLayer); // I doubt that this funciton was necessary
-int getNextPLayer();
+int getNextPlayer();
 void announceEnd();
 
 int field[FIELD_SIZE];
@@ -32,31 +32,31 @@ int currentPlayer = PLAYER_ONE;
 
 
 int main() {
-	generateField();
+	generateField(field);
 	setChar_of_Player(PLAYER_ONE);
 	setChar_of_Player(PLAYER_TWO);
-	while(game_status() == GAME_RUNNING) {
-		showField();
-		int move = getMove(currentPLayer);
+	while(game_status(field) == GAME_RUNNING) {
+		showField(field);
+		int move = getMove(currentPlayer);
 		if(is_move_legal(field,move) == TRUE) {
-			doMove(move, currentPLayer);
+			doMove(move, currentPlayer);
 		}
-		if(game_status() == GAME_RUNNING) {
-			currentPlayer = getNextPLayer();
-			showField();
-			int move = getMove(currentPLayer);
+		if(game_status(field) == GAME_RUNNING) {
+			currentPlayer = getNextPlayer();
+			showField(field);
+			int move = getMove(currentPlayer);
 			if(is_move_legal(field,move) == TRUE) {
-				doMove(move, currentPLayer);
+				doMove(move, currentPlayer);
 			}
 		}
-		currentPlayer = getNextPLayer();
+		currentPlayer = getNextPlayer();
 	}
 	announceEnd();
 }
 
 
 
-void generateField(int field[]); {
+void generateField(int field[]) {
 	for(int i = 0; i < FIELD_SIZE;i++) {
 		field[i] = -1;
 	}
@@ -64,7 +64,8 @@ void generateField(int field[]); {
 
 void setChar_of_Player(int player) {
 	printf("Enter char of Player %d: \n",player);
-	playerChars[player] = getChar();
+	char c = getChar();
+	playerChars[player] = c;
 }
 
 
@@ -88,7 +89,13 @@ int game_status(int field[]) {
 	if(field[4] != -1 && int_elements_equal(field[2],field[4],field[6]) == TRUE) {
 		return field[4];
 	}
-	return GAME_RUNNING;
+
+	for(int i = 0; i < FIELD_SIZE;i++) {
+		if(field[i] == EMPTY_FIELD) {
+			return GAME_RUNNING;		
+		}
+	}
+	return TIE;
 }
 
 int int_elements_equal(int x, int y , int z) {
@@ -98,7 +105,7 @@ int int_elements_equal(int x, int y , int z) {
 	return FALSE;
 }
 
-void showField(char field[]) {
+void showField(int field[]) {
 	update_char_field(field);
 	printf("%d | %d | %d\n",char_field[0],char_field[1],char_field[2]);
 	printf(" - + - + -\n");
@@ -119,7 +126,7 @@ void update_char_field(int field[]) {
 	}
 }
 
-int getMove(int current_Player) {
+int getMove(int currentPlayer) {
 	printf("Its your turn Player %d or %c ! Make a move(0-8): \n",currentPlayer, playerChars[currentPlayer]);
 
 	return getChar();
@@ -133,12 +140,12 @@ int is_move_legal(int field[], int move) {
 	}
 }
 
-void doMove(int move, int currentPLayer) {
+void doMove(int move, int currentPlayer) {
 	field[move] = currentPlayer; 
 }
 
-int getNextPLayer() {
-	if(currentPlayer == PLAYDER_ONE) {
+int getNextPlayer() {
+	if(currentPlayer == PLAYER_ONE) {
 		return PLAYER_TWO;
 	} else {
 		return PLAYER_ONE;
@@ -146,7 +153,7 @@ int getNextPLayer() {
 }
 
 void announceEnd() {
-	int x = game_status();
+	int x = game_status(field);
 	if(x == TIE) {
 		printf("It is a tie!");
 	} else {
