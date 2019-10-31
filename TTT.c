@@ -15,6 +15,7 @@
 
 void generateField(int field[]);
 void setChar_of_Player(int player);
+char read_from_console_skip_new_line();
 int game_status(int field[]);
 int int_elements_equal(int x, int y , int z);
 void update_char_field(int field[]);
@@ -64,8 +65,14 @@ void generateField(int field[]) {
 
 void setChar_of_Player(int player) {
 	printf("Enter char of Player %d: \n",player);
-	char c = getChar();
+	char c = read_from_console_skip_new_line();
 	playerChars[player] = c;
+}
+
+char read_from_console_skip_new_line() {
+	char c;
+	while((c = getchar() ) == '\n') {}
+	return c;
 }
 
 
@@ -107,11 +114,11 @@ int int_elements_equal(int x, int y , int z) {
 
 void showField(int field[]) {
 	update_char_field(field);
-	printf("%d | %d | %d\n",char_field[0],char_field[1],char_field[2]);
-	printf(" - + - + -\n");
-	printf("%d | %d | %d\n",char_field[0],char_field[1],char_field[2]);
-	printf(" - + - + -\n");
-	printf("%d | %d | %d\n",char_field[0],char_field[1],char_field[2]);
+	printf("%c | %c | %c\n",char_field[0],char_field[1],char_field[2]);
+	printf("- + - + -\n");
+	printf("%c | %c | %c\n",char_field[3],char_field[4],char_field[5]);
+	printf("- + - + -\n");
+	printf("%c | %c | %c\n",char_field[6],char_field[7],char_field[8]);
 }
 
 void update_char_field(int field[]) {
@@ -128,8 +135,9 @@ void update_char_field(int field[]) {
 
 int getMove(int currentPlayer) {
 	printf("Its your turn Player %d or %c ! Make a move(0-8): \n",currentPlayer, playerChars[currentPlayer]);
-
-	return getChar();
+		
+	
+	return read_from_console_skip_new_line()-48;
 }
 
 int is_move_legal(int field[], int move) {
@@ -152,11 +160,12 @@ int getNextPlayer() {
 	}
 }
 
+
 void announceEnd() {
 	int x = game_status(field);
 	if(x == TIE) {
-		printf("It is a tie!");
+		printf("It is a tie!\n");
 	} else {
-		printf("Congretulations Player %d // %c you won!",x,playerChars[x]);
+		printf("Congretulations Player %d // %c you won! \n",x,playerChars[x]);
 	}
 }
