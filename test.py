@@ -1,2 +1,4 @@
-field[3] = 1
-print(field)
+if True:
+    winner = 10
+    
+print(winner)
