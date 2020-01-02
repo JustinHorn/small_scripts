@@ -43,7 +43,11 @@ class TTT():
     def get_NNMove(self):
         field_as_inputVector = self.fieldToInputVector()
         move_as_vector = self.model.predict([field_as_inputVector])
-        return self.outputVectorToMove( move_as_vector)
+        m = self.outputVectorToMove( move_as_vector)
+        while not self.is_moveLegal(m):
+            move_as_vector  = np.delete(move_as_vector,m)
+            m = self.outputVectorToMove( move_as_vector)
+        return m
           
      
     def get_humanMove(self):
