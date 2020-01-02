@@ -4,10 +4,11 @@ import numpy as np
 with open("trainData.txt","r") as o:
     data = o.read()
 
+#parse
+
 data = data.replace("\n","|||")
 data = data.split("|||")
 data = data[:-1] # remove last
-#parse
 inputVector, outputVector = [],[]
 
 for index, vector in enumerate(data):
@@ -34,19 +35,17 @@ outputVector = list(map(changeString_toFloat, outputVector) )
 inputVector = list(map(lambda x: [float(e) for e in x] ,inputVector) )
 outputVector = list(map(lambda x: [float(e) for e in x], outputVector) )
 
-def write_VectorList_to_file(vectorList,fileName):
-    string = ""
-    for out in vectorList:
-        string = string + str(out)+"\n"  
-    with open(fileName,"w") as out:
-        out.write(string)
-
-write_VectorList_to_file(inputVector,"inputData.txt")
-write_VectorList_to_file(outputVector,"outputData.txt")
 
 inputVector = np.array(inputVector)
 outputVector = np.array(outputVector)
 
 inputVector = inputVector.astype(np.float32)
 outputVector = outputVector.astype(np.float32)
+
+def write_VectorList_to_file(vectorList,fileName):
+    string = ""
+    for out in vectorList:
+        string = string + str(out)+"\n"  
+    with open(fileName,"w") as out:
+        out.write(string)
 
