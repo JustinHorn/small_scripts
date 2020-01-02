@@ -1,6 +1,5 @@
 
 import numpy as np
-from TTT_NN import *
 import pickle
 
 
@@ -17,12 +16,14 @@ class TTT():
         move_func = [self.get_humanMove]*2
         self._play(move_func)
 
-    def play_humanVsMachine(self):
+    def play_humanVsMachine(self,humanstarts:bool=True):
         if self.model == None:
             with open('TTTnn.pkl', 'rb') as input_stream:
                 self.model = pickle.load(input_stream)
 
         move_func = [self.get_humanMove,self.get_NNMove]
+        if not humanstarts:
+            move_func = move_func.reverse()
         self._play(move_func)    
 
     def _play(self, get_move):

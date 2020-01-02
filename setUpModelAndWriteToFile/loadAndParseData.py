@@ -28,9 +28,21 @@ def changeString_toFloat(string):
 inputVector = list(map(changeString_toFloat, inputVector) )
 outputVector = list(map(changeString_toFloat, outputVector) )
 
+
+
+
 inputVector = list(map(lambda x: [float(e) for e in x] ,inputVector) )
 outputVector = list(map(lambda x: [float(e) for e in x], outputVector) )
 
+def write_VectorList_to_file(vectorList,fileName):
+    string = ""
+    for out in vectorList:
+        string = string + str(out)+"\n"  
+    with open(fileName,"w") as out:
+        out.write(string)
+
+write_VectorList_to_file(inputVector,"inputData.txt")
+write_VectorList_to_file(outputVector,"outputData.txt")
 
 inputVector = np.array(inputVector)
 outputVector = np.array(outputVector)
@@ -38,7 +50,3 @@ outputVector = np.array(outputVector)
 inputVector = inputVector.astype(np.float32)
 outputVector = outputVector.astype(np.float32)
 
-print(inputVector.shape)
-print(outputVector.shape)
-print(inputVector[0].shape)
-print(outputVector[0].shape)
