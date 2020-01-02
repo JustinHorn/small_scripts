@@ -43,6 +43,7 @@ class Model():
 
     def predict(self, x):
         activation = x
+        print(x)
         for i,l_weight in enumerate(self.layer_weights):
             neuron_inputs = tf.math.add(tf.linalg.matmul(activation,l_weight),self.bias_weights[i])
             activation = tf.nn.sigmoid(neuron_inputs)
