@@ -30,7 +30,8 @@ class TTT():
         self.send_endMessage(WINNER)
 
     def get_nnMove(self,field=None):
-        if field == None: field = self.field
+        if field == None: 
+            field = self.field
         return model.predict(field)
           
      
@@ -46,14 +47,16 @@ class TTT():
                 return move
 
     def is_moveLegal(self,move,field=None):
-        if field == None: field = self.field
+        if field == None: 
+            field = self.field
         return  self.field[move] == self.EMPTY;
 
     def make_move(self,move): # i guess it associates type at init
         self.field[move] = self.PLAYER_SIGNS[self.current_player]
 
     def is_gameOver_whoWon(self,field=None):
-        if field == None: field = self.field
+        if field == None: 
+            field = self.field
         for i in range(0,3):
             if (same(field,[x+i*3 for x in [0,1,2]]) and  field[i*3] != self.EMPTY):  #horizontal
                 return True, field[i*3]
@@ -75,7 +78,8 @@ class TTT():
         print("Congretulations Player ",WINNER," you won!");
     
     def display_field(self,field=None):
-        if field == None: field = self.field
+        if field == None: 
+            field = self.field
         for i in range(3):
             if not i== 0: print("---------")
             print(field[i*3],"|",field[1+i*3],"|",field[2+i*3])
@@ -84,8 +88,8 @@ class TTT():
 
 
 def same(arr, list):
-    for i in list:
-        if i and arr[list[0]] != arr[i]:return False
+    for e in list:
+        if e and arr[list[0]] != arr[i]:return False
     return True;
 ################### MAIN ##############################
 
