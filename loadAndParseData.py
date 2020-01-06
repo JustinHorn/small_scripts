@@ -3,7 +3,7 @@ import numpy as np
 
 
 def load_and_parse_data():
-    with open("trainData.txt","r") as o:
+    with open("TTT_NN_FILES\trainData.txt","r") as o:
         data = o.read()
 
     data = data.replace("\n","|||")

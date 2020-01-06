@@ -26,7 +26,7 @@ def match(model_function,model):
         m = model_function[g.current_player](g.field,model[g.current_player])
         if g.is_moveLegal(m):
             g.make_move(m)
-            (g.game_over ,WINNER) = g.is_gameOver_whoWon()
+            (g.game_over ,WINNER) = g.eval_game()
             if not g.game_over:
                 g.swap_player()
         else:
@@ -71,7 +71,7 @@ def score_match(model):
             m = get_NNMove(g,model)
         if g.is_moveLegal(m):
             g.make_move(m)
-            (g.game_over ,WINNER) = g.is_gameOver_whoWon()
+            (g.game_over ,WINNER) = g.eval_game()
             if not g.game_over:
                 g.swap_player()
         else:
@@ -107,7 +107,7 @@ def train_population(p,generations=101,checkpoint=97):
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
-    p.add_reporter(neat.Checkpointer(checkpoint,flename="NEAT_Files\neat-checkpoint-99"))
+    p.add_reporter(neat.Checkpointer(checkpoint,filename="NEAT_Files\neat-checkpoint-99"))
 
     winner = p.run(fitness,generations)
 

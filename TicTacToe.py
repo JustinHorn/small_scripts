@@ -31,7 +31,7 @@ class TTT():
         self._play(move_func)    
 
     def readModelFromFile(self):
-        with open('TTTnn.pkl', 'rb') as input_stream:
+        with open('TTT_NN_FILES\TTTnn.pkl', 'rb') as input_stream:
             self.model = pickle.load(input_stream)
         pass
 
@@ -43,7 +43,7 @@ class TTT():
             m = get_move[self.current_player]()
             if self.is_moveLegal(m):
                 self.make_move(m)
-                (self.game_over ,WINNER) = self.is_gameOver_whoWon()
+                (self.game_over ,WINNER) = self.eval_game()
                 if not self.game_over:
                     self.swap_player()
             else:
@@ -53,7 +53,7 @@ class TTT():
             self.send_endMessage(WINNER)
 
     def get_NNMove(self): # to Test
-        inputVector = TTT.field_toList(self.field,self.EMPTY,self.PLAYER_SIGNS)
+        inputVector = TTT.fieldToList(self.field,self.EMPTY,self.PLAYER_SIGNS)
         moveTensor = self.model.predict([inputVector])
         moveVector =(moveTensor).numpy().astype(np.float32)[0]
         m =  TTT.vectorToMove(moveVector)
@@ -86,7 +86,7 @@ class TTT():
     def make_move(self,move): # i guess it associates type at init
         self.field[move] = self.PLAYER_SIGNS[self.current_player]
 
-    def is_gameOver_whoWon(self): #to Test
+    def eval_game(self): #to Test
         field = self.field
         for i in range(0,3):
             if (same(field,[x+i*3 for x in [0,1,2]]) and  field[i*3] != self.EMPTY):  #horizontal
@@ -115,7 +115,7 @@ class TTT():
             print(field[i*3],"|",field[1+i*3],"|",field[2+i*3])
     
     @staticmethod
-    def field_toList(field,EMPTY=' ',PLAYER_SIGNS=['X','O']):
+    def fieldToList(field,EMPTY=' ',PLAYER_SIGNS=['X','O']):
         vector = []
         for char in field:
             x = [0.01]*3
@@ -130,13 +130,13 @@ class TTT():
         return vector
 
     @staticmethod
-    def  field_toVector(field,EMPTY,PLAYER_SIGNS):
-        l = TTT.field_toList(field,EMPTY,PLAYER_SIGNS)
+    def  fieldToVector(field,EMPTY,PLAYER_SIGNS):
+        l = TTT.fieldToList(field,EMPTY,PLAYER_SIGNS)
         return np.array(l).astype(np.float32)
     
     @staticmethod
-    def  field_toInputVector(field):
-        l = TTT.field_toInputList(field)
+    def  fieldToVector(field):
+        l = TTT.fieldToList(field)
         return np.array(l).astype(np.float32)
 
     @staticmethod

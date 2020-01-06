@@ -16,15 +16,15 @@ class Test_TTT(unittest.TestCase):
             self.assertEqual(ttt.field[0],ttt.PLAYER_SIGNS[ttt.current_player])
             ttt.swap_player()
 
-    def test_is_gameOver_whoWon(self):
+    def test_evalGame(self):
         ttt = TTT()
         for i in range(7):
             ttt.make_move(i)
             ttt.swap_player()
             if i < 6:
-                self.assertEqual(ttt.is_gameOver_whoWon()[0],False)
+                self.assertEqual(ttt.eval_game()[0],False)
             else:
-                self.assertEqual(ttt.is_gameOver_whoWon()[0],True)
+                self.assertEqual(ttt.eval_game()[0],True)
 
     
     def test_readModelFromFile(self):
