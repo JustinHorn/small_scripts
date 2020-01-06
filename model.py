@@ -9,8 +9,7 @@ import tensorflow as tf
 # dataset variables
 
 #Model variables
-hidden_layer_size = 100
-nodes = [27,hidden_layer_size,9]
+
 
 def r_squared(y_true, y_pred):
     numerator = tf.math.reduce_sum(tf.math.square(y_true - y_pred))
@@ -19,31 +18,9 @@ def r_squared(y_true, y_pred):
     r2 = tf.math.subtract(1.0, tf.math.divide(numerator, denominator))
     return r2
 
-def TicTacToefield_toInputList(field,EMPTY,PLAYER_SIGNS):
-    vector = []
-    for char in field:
-        x = [0.01]*3
-        if char ==.EMPTY:
-            x[0] = 0.99
-        elif char ==.PLAYER_SIGNS[1]:
-            x[1] = 0.99
-        else:
-            x[2] = 0.99
-        for e in x:
-            vector.append(e)
-    return vector
-
-def   TicTacToefield_toInputVector(field,EMPTY,PLAYER_SIGNS):
-    l = TicTacToefield_toInputList(field,EMPTY,PLAYER_SIGNS)
-    return np.array(l).astype(np.float32)
-
-
-
-def outputVectorToMove(self,vector):
-    return np.argmax(vector)
 
 class Model():
-    def __init__(self,actFunc=tf.nn.sigmoid):
+    def __init__(self,nodes,actFunc=tf.nn.sigmoid):
         #Weights (Matrices)
         self.actFunc =actFunc
         self.layer_weights=[]
@@ -108,3 +85,18 @@ class Model():
     def compute_metrics(self,x,y):
         y_pred = self.predict(x)    
         return r_squared(y,y_pred)
+
+
+def get_trained_ttt_net(
+    epochs=1000,givae_all_x_epochs_status=10,save_tofile=False):
+    from loadAndParseData import load_and_parse_data
+
+    inputVecot,outputVector = load_and_parse_data()
+
+    ttt_net = Model([27,100,9])
+    ttt_net.fit(inputVector,outputVector,epochs,givae_all_x_epochs_status)
+    if save_tofile:
+        import pickle
+        with open('TTTnn.pkl', 'wb') as output:
+            pickle.dump(model, output, pickle.HIGHEST_PROTOCOL)
+    return ttt_net

@@ -4,44 +4,26 @@ import neat
 import visualize
 import random
 from TicTacToe import *
-from model import TicTacToefield_ToInputList,outputVectorToMove
 
 game_TTT = TTT()
 
 averageFitness=0
 
-def fieldToInputVector(field):
-    vector = []
-    for char in field:
-        x = [0.01]*3
-        if char == game_TTT.EMPTY:
-            x[0] = 0.99
-        elif char == game_TTT.PLAYER_SIGNS[1]:
-            x[1] = 0.99
-        else:
-            x[2] = 0.99
-        for e in x:
-            vector.append(e)
-    return vector
 
-def outputVectorToMove(vector):
-    return np.argmax(vector)
-
-
-def get_NNMove(game,model): ## needs improvement!
-    field_as_inputVector = fieldToInputVector(game_TTT.field)
-    move_as_vector = model.activate(tuple(field_as_inputVector)) # STUPID IMPLEMENTATION!!!!!!!
-    m = outputVectorToMove( list(move_as_vector))
-    while not game.is_moveLegal(m):
-        move_as_vector[m] = -99999999.0
-        m = outputVectorToMove( move_as_vector)
+def get_NNMove(field,model): ## needs improvement!
+    inputVector = TTT.fieldToVector(field)
+    moveVector = model.activate(tuple(inputVector)) # STUPID IMPLEMENTATION!!!!!!!
+    m = TTT.vectorToMove( list(moveVector))
+    while not TTT.is_moveLegal(field,m):
+        moveVector[m] = -99999999.0
+        m = TTT.vectorToMove( moveVector)
     return m         
 
 def match(model_function,model):
     g = game_TTT
     g.reset()
     while not g.game_over:
-        m = model_function[g.current_player](g,model[g.current_player])
+        m = model_function[g.current_player](g.field,model[g.current_player])
         if g.is_moveLegal(m):
             g.make_move(m)
             (g.game_over ,WINNER) = g.is_gameOver_whoWon()
@@ -51,8 +33,13 @@ def match(model_function,model):
             print("Illegal move!")
     return WINNER
 
-int_actual_generations = 0
 
+def calc_and_save_current_avg_fitness(genomes):
+    global averageFitness
+    averageFitness = 0
+    for genome_id, genome in genomes:
+        averageFitness += genome.fitness
+    averageFitness = averageFitness / len(genomes)
 
 def fitness(genomes,config):
     for genome_id, genome in genomes:
@@ -68,13 +55,9 @@ def fitness(genomes,config):
                         genome.fitness+=1
                     elif winner == 'O':
                         opponent_genome.fitness+=1
-    global averageFitness
-    averageFitness = 0
-    for genome_id, genome in genomes:
-        averageFitness += genome.fitness
-    averageFitness = averageFitness / len(genomes)
-    global int_actual_generations
-    int_actual_generations+=1
+    calc_and_save_current_avg_fitness()
+
+
 
 def score_match(model):
     g = game_TTT
@@ -109,28 +92,29 @@ def genome_vs_SupervisedTTTFedForward(genome_net,total=100):
 def show_winner_build_and_score(winner,p):
     print('\nBest genome:\n{!s}'.format(winner))
     
-    print("Winner Fitness is ", winner.fitness, "\n average fitness ist:", averageFitness, "\n winner is", winner.fitness/averageFitness," as fit as the average")
+    print("Winner Fitness is ", winner.fitness, "\n average fitness ist:", averageFitness,
+     "\n winner is", winner.fitness/averageFitness,"times as fit as the average")
+
     winner_net = neat.nn.FeedForwardNetwork.create(winner, p.config)
     genome_vs_SupervisedTTTFedForward(winner_net)
-    print("actual_generations: ",int_actual_generations)
+    
     node_names = {}
     for index in range(-27,9):
         node_names[index] = str(index)
-    #node_names = {-1:'A', -2: 'B', 0:'A XOR B'}
     visualize.draw_net(p.config, winner, True, node_names=node_names)
 
 def train_population(p,generations=101,checkpoint=97):
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
-    p.add_reporter(neat.Checkpointer(checkpoint))
+    p.add_reporter(neat.Checkpointer(checkpoint,flename="NEAT_Files\neat-checkpoint-99"))
 
     winner = p.run(fitness,generations)
 
     show_winner_build_and_score(winner,p)
 
-    visualize.plot_stats(stats, ylog=False, view=True)
-    visualize.plot_species(stats, view=True)
+    visualize.plot_stats(stats, ylog=False, view=True,filename="NEAT_Files\avg_fitness.svg")
+    visualize.plot_species(stats, view=True,filename="NEAT_Files\speciation.svg")
 
 
 def run(file_path):

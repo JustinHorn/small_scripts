@@ -1,5 +1,6 @@
 import unittest
 from TicTacToe import TTT
+import random
 
 class Test_TTT(unittest.TestCase):
 
@@ -30,9 +31,20 @@ class Test_TTT(unittest.TestCase):
         ttt = TTT()
         ttt.readModelFromFile()
 
- 
+    def test_play_ai_vs_random(self):
+        ttt = TTT()
+        def get_randomMove():
+            m = []
+            for i in range(9):
+                if ttt.is_moveLegal(i):
+                    m.append(i)
+            i = random.randrange(0,len(m))
+            return m[i]
 
-        
+        for i in range(9):    
+            ttt.reset
+            ttt._play([ttt.get_NNMove,get_randomMove],show=False)
+
 
 if __name__ == '__main__': # if you call only python test_TTT.py - it will call unittest.main()
     unittest.main()
