@@ -6,7 +6,6 @@ import tensorflow as tf
 
 
 
-
 # dataset variables
 
 #Model variables
@@ -18,7 +17,30 @@ def r_squared(y_true, y_pred):
     y_true_mean = tf.math.reduce_mean(y_true)
     denominator = tf.math.reduce_sum(tf.math.square(y_true - y_true_mean))
     r2 = tf.math.subtract(1.0, tf.math.divide(numerator, denominator))
-    return r2#tf.clip_by_value(r2, clip_value_min=0.0, clip_value_max=1.0)
+    return r2
+
+def TicTacToefield_toInputList(field,EMPTY,PLAYER_SIGNS):
+    vector = []
+    for char in field:
+        x = [0.01]*3
+        if char ==.EMPTY:
+            x[0] = 0.99
+        elif char ==.PLAYER_SIGNS[1]:
+            x[1] = 0.99
+        else:
+            x[2] = 0.99
+        for e in x:
+            vector.append(e)
+    return vector
+
+def   TicTacToefield_toInputVector(field,EMPTY,PLAYER_SIGNS):
+    l = TicTacToefield_toInputList(field,EMPTY,PLAYER_SIGNS)
+    return np.array(l).astype(np.float32)
+
+
+
+def outputVectorToMove(self,vector):
+    return np.argmax(vector)
 
 class Model():
     def __init__(self,actFunc=tf.nn.sigmoid):
@@ -71,10 +93,10 @@ class Model():
        # print("Weights at the end: ", self.get_variables())
 
     def update_variables(self, x_train,y_train):
-        with tf.GradientTape() as tape:
+        with tf.GradientTape() as tape: #records operations within GradientTaoe()
             y_pred = self.predict(x_train)
             loss = self.loss(y_train, y_pred)
-        gradients = tape.gradient(loss, self.variables)
+        gradients = tape.gradient(loss, self.variables) #  derivate of z in respect to the variables
         self.optimizer.apply_gradients(zip(gradients,self.variables))   
         return loss
 

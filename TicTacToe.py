@@ -1,7 +1,7 @@
 
 import numpy as np
 import pickle
-
+from Model import *
 
 class TTT():
 
@@ -10,25 +10,30 @@ class TTT():
         self.PLAYER_SIGNS = ['X','O']
         self.current_player = 0
         self.field = [' ']*9
-        self.model = None
+        self.readModelFromFile()
 
-    def play_hVsH(self):
+    def reset(self):
+        self.EMPTY = ' '
+        self.current_player = 0
+        self.field = [' ']*9
+
+    def play_hVsH(self): #to Test
         move_func = [self.get_humanMove]*2
         self._play(move_func)
 
-    def play_humanVsMachine(self,humanstarts:bool=True):
-        if self.model == None:
-            with open('TTTnn.pkl', 'rb') as input_stream:
-                self.model = pickle.load(input_stream)
-
+    def play_humanVsMachine(self,humanstarts:bool=True): # to test
         move_func = [self.get_humanMove,self.get_NNMove]
         if not humanstarts:
             move_func = move_func.reverse()
         self._play(move_func)    
 
-    def _play(self, get_move):
-        self.field = [' ']*9
-        game_over = False
+    def readModelFromFile(self):
+        with open('TTTnn.pkl', 'rb') as input_stream:
+            self.model = pickle.load(input_stream)
+        pass
+
+    def _play(self, get_move):# to Test
+        self.reset()
         while not game_over:
             self.display_field()
             m = get_move[self.current_player]()
@@ -37,18 +42,23 @@ class TTT():
                 (game_over ,WINNER) = self.is_gameOver_whoWon()
                 if not game_over:
                     self.swap_player()
+            else:
+                print("Illegal move!")
         self.display_field()
         self.send_endMessage(WINNER)
 
-    def get_NNMove(self):
-        field_as_inputVector = self.fieldToInputVector()
+    def get_NNMove(self): # to Test
+        field_as_inputVector = TicTacToefield_toInputList()
         move_as_vector = self.model.predict([field_as_inputVector])
-        m = self.outputVectorToMove( move_as_vector)
+        move_as_vector=(move_as_vector).numpy().astype(np.float32)[0]
+        m = outputVectorToMove(move_as_vector )
         while not self.is_moveLegal(m):
-            move_as_vector  = np.delete(move_as_vector,m)
-            m = self.outputVectorToMove( move_as_vector)
+            move_as_vector[m] = -99999999.0
+            m = outputVectorToMove( move_as_vector)
         return m
-          
+
+
+
      
     def get_humanMove(self):
         string = "Enter the field you want to mark Player " + self.PLAYER_SIGNS[self.current_player] + ": (0-8):"
@@ -68,7 +78,7 @@ class TTT():
     def make_move(self,move): # i guess it associates type at init
         self.field[move] = self.PLAYER_SIGNS[self.current_player]
 
-    def is_gameOver_whoWon(self):
+    def is_gameOver_whoWon(self): #to Test
         field = self.field
         for i in range(0,3):
             if (same(field,[x+i*3 for x in [0,1,2]]) and  field[i*3] != self.EMPTY):  #horizontal
@@ -96,23 +106,6 @@ class TTT():
             if not i== 0: print("---------")
             print(field[i*3],"|",field[1+i*3],"|",field[2+i*3])
     
-    def fieldToInputVector(self):
-        field = self.field
-        vector = []
-        for char in field:
-            x = [0.01]*3
-            if char == self.EMPTY:
-                x[0] = 0.99
-            elif char == self.PLAYER_SIGNS[1]:
-                x[1] = 0.99
-            else:
-                x[2] = 0.99
-            for e in x:
-                vector.append(e)
-        return np.array(vector).astype(np.float32)
-    
-    def outputVectorToMove(self,vector):
-        return np.argmax(vector)
 
 
 
@@ -122,8 +115,10 @@ def same(arr, list_of_indexes):
     return True;
 ################### MAIN ##############################
 
-game = TTT()
-# print(game.fieldToInputVector().shape)
-# print(game.fieldToInputVector())
+# game = TTT()
+# # print(game.fieldToInputVector().shape)
+# # print(game.fieldToInputVector())
+# game.readModelFromFile()
+# print("Ai vs Ai,", game.AImatch([game.model.predict,game.model.predict]))
+# #game.display_field()
 
-game.play_humanVsMachine()
