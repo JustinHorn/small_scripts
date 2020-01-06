@@ -31,20 +31,39 @@ class Test_TTT(unittest.TestCase):
         ttt = TTT()
         ttt.readModelFromFile()
 
+    def test_play_random_vs_random(self):
+        ttt,get_randomMove = funcAndTTT()
+
+        for i in range(9):    
+            ttt.reset
+            ttt._play([get_randomMove,get_randomMove],show=False)
+
     def test_play_ai_vs_random(self):
-        ttt = TTT()
-        def get_randomMove():
-            m = []
-            for i in range(9):
-                if ttt.is_moveLegal(i):
-                    m.append(i)
-            i = random.randrange(0,len(m))
-            return m[i]
+        ttt,get_randomMove = funcAndTTT()
 
         for i in range(9):    
             ttt.reset
             ttt._play([ttt.get_NNMove,get_randomMove],show=False)
 
+    def test_play_ai_vs_ai(self):
+        ttt = TTT()
+
+        for i in range(9):    
+            ttt.reset
+            ttt._play([ttt.get_NNMove,ttt.get_NNMove],show=False)
+
+
+
+def funcAndTTT():
+    ttt = TTT()
+    def get_randomMove():
+        m = []
+        for i in range(9):
+            if ttt.is_moveLegal(i):
+                m.append(i)
+        i = random.randrange(0,len(m))
+        return m[i]
+    return ttt, get_randomMove   
 
 if __name__ == '__main__': # if you call only python test_TTT.py - it will call unittest.main()
     unittest.main()
