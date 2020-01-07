@@ -1,6 +1,7 @@
 
 import numpy as np
 import pickle
+import random
 from model import *
 
 class TTT():
@@ -8,10 +9,8 @@ class TTT():
     def __init__(self):
         self.EMPTY = ' '
         self.PLAYER_SIGNS = ['X','O']
-        self.current_player = 0
-        self.field = [' ']*9
+        self.reset()
         self.readModelFromFile()
-        self.game_over = False
 
     def reset(self):
         self.EMPTY = ' '
@@ -22,25 +21,28 @@ class TTT():
 
     def play_hVsH(self): #to Test
         move_func = [self.get_humanMove]*2
-        self._play(move_func)
+        self._match(move_func)
 
     def play_humanVsMachine(self,humanstarts:bool=True): # to test
         move_func = [self.get_humanMove,self.get_NNMove]
         if not humanstarts:
             move_func = move_func.reverse()
-        self._play(move_func)    
+        self._match(move_func)    
 
     def readModelFromFile(self):
         with open('TTT_NN_FILES\TTTnn.pkl', 'rb') as input_stream:
             self.model = pickle.load(input_stream)
         pass
 
-    def _play(self, get_move,show=True):# to Test
+    def _match(self, get_move:list,show=False,startRandom=False):# to Test
         self.reset()
+        if startRandom:
+            self.field[random.randrange(0,9)] = [self.PLAYER_SIGNS[0]]
+            self.current_player = 1
         while not self.game_over:
             if show:
                 self.display_field()
-            m = get_move[self.current_player]()
+            m = get_move[self.current_player](self.field)
             if self.is_moveLegal(m):
                 self.make_move(m)
                 (self.game_over ,WINNER) = self.eval_game()
@@ -51,9 +53,10 @@ class TTT():
         if show:
             self.display_field()
             self.send_endMessage(WINNER)
+        return WINNER
 
-    def get_NNMove(self): # to Test
-        inputVector = TTT.fieldToList(self.field,self.EMPTY,self.PLAYER_SIGNS)
+    def get_NNMove(self,field): # to Test
+        inputVector = TTT.fieldToList(field,self.EMPTY,self.PLAYER_SIGNS)
         moveTensor = self.model.predict([inputVector])
         moveVector =(moveTensor).numpy().astype(np.float32)[0]
         m =  TTT.vectorToMove(moveVector)
@@ -62,10 +65,8 @@ class TTT():
             m =  TTT.vectorToMove( moveVector)
         return m
 
-
-
      
-    def get_humanMove(self):
+    def get_humanMove(self,field):
         string = "Enter the field you want to mark Player " + self.PLAYER_SIGNS[self.current_player] + ": (0-8):"
         while True:
             try:

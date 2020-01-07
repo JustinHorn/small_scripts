@@ -36,27 +36,27 @@ class Test_TTT(unittest.TestCase):
 
         for i in range(9):    
             ttt.reset
-            ttt._play([get_randomMove,get_randomMove],show=False)
+            ttt._match([get_randomMove,get_randomMove],show=False)
 
     def test_play_ai_vs_random(self):
         ttt,get_randomMove = funcAndTTT()
 
         for i in range(9):    
             ttt.reset
-            ttt._play([ttt.get_NNMove,get_randomMove],show=False)
+            ttt._match([ttt.get_NNMove,get_randomMove],show=False)
 
     def test_play_ai_vs_ai(self):
         ttt = TTT()
 
         for i in range(9):    
             ttt.reset
-            ttt._play([ttt.get_NNMove,ttt.get_NNMove],show=False)
+            ttt._match([ttt.get_NNMove,ttt.get_NNMove],show=False)
 
 
 
 def funcAndTTT():
     ttt = TTT()
-    def get_randomMove():
+    def get_randomMove(field):
         m = []
         for i in range(9):
             if ttt.is_moveLegal(i):

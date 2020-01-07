@@ -18,14 +18,16 @@ class Neat_Train():
         self.showGraphics = showGraphics
         
     @staticmethod
-    def get_NNMove(field,model): ## needs improvement!
-        inputVector = TTT.fieldToVector(field)
-        moveVector = model.activate(tuple(inputVector)) # STUPID IMPLEMENTATION!!!!!!!
-        m = TTT.vectorToMove( list(moveVector))
-        while not TTT.moveLegal(field,m):
-            moveVector[m] = -99999999.0
-            m = TTT.vectorToMove( moveVector)
-        return m         
+    def get_NNMove_func(net): ## needs improvement!
+        def func(field):
+            inputVector = TTT.fieldToVector(field)
+            moveVector = net.activate(tuple(inputVector)) # STUPID IMPLEMENTATION!!!!!!!
+            m = TTT.vectorToMove( list(moveVector))
+            while not TTT.moveLegal(field,m):
+                moveVector[m] = -99999999.0
+                m = TTT.vectorToMove( moveVector)
+            return m      
+        return func   
 
     def calc_AVGFitness(self,genomes):
         self.averageFitness = 0
@@ -42,22 +44,22 @@ class Neat_Train():
                 if not opponent_id == genome_id:
                     opp_net = neat.nn.FeedForwardNetwork.create(genome,config)
                     for i in range(10):
-                        move_func = self.get_NNMove
-                        winner = self.match([move_func,move_func],[net,opp_net])
+                        f = Neat_Train.get_NNMove_func
+                        winner = self.gameTTT._match([f(net),f(opp_net)])
                         if winner ==  'X':
                             genome.fitness+=1
                         elif winner == 'O':
                             opponent_genome.fitness+=1
         self.calc_AVGFitness(genomes)
 
-    def match(self,model_functions:list,models:list,start_random=False):
+    def match(self,model_functions:list,start_random=False):
         g = self.gameTTT # or TTT()
         g.reset()
         if start_random:
             g.field[random.randrange(0,9)] = [g.PLAYER_SIGNS[0]]
             g.current_player = 1
         while not g.game_over:
-            m = Neat_Train.get_Move(g,model_functions,models)
+            m = model_functions[g.current_player](g.field)
             if g.is_moveLegal(m):
                 g.make_move(m)
                 (g.game_over ,WINNER) = g.eval_game()
@@ -67,16 +69,11 @@ class Neat_Train():
                 print("Illegal move!")
         return WINNER
 
-    def get_Move(g,model_functions:list,models:list):
-        if model_functions[g.current_player] == g.get_NNMove:
-            return model_functions[g.current_player]()
-        else:
-            return model_functions[g.current_player](g.field,models[g.current_player])
 
     def genome_vs_Supervised(self,genome_net,total=100):
         losses = 0
         for i in range(total):
-            winner = self.match([self.gameTTT.get_NNMove,Neat_Train.get_NNMove],[None,genome_net],start_random=True)
+            winner = self.gameTTT._match([self.gameTTT.get_NNMove,Neat_Train.get_NNMove_func(genome_net)],startRandom=True)
             if winner ==  'X':
                 losses+=1
         print("genome lost: ",losses," matches out of", 
@@ -111,8 +108,10 @@ class Neat_Train():
             visualize.plot_species(stats, view=True,filename=self.dir+"speciation.svg")
 
     def run(self,configName):
-
-        p = neat.population.Population(self.dir+configName)
+        config = neat.config.Config(neat.DefaultGenome,neat.DefaultReproduction
+        ,neat.DefaultSpeciesSet,neat.DefaultStagnation
+        ,self.dir+configName)
+        p = neat.population.Population(config)
         self.train_population(p)
 
     def check_out_population(self,p):  
