@@ -7,7 +7,7 @@ from TicTacToe import *
 
 
 class Neat_Train():
-    game_TTT = TTT()
+    gameTTT = TTT()
 
     averageFitness=0
 
@@ -27,29 +27,14 @@ class Neat_Train():
             m = TTT.vectorToMove( moveVector)
         return m         
 
-    def match(model_function,model):
-        g = Neat_Train.game_TTT # or TTT()
-        g.reset()
-        while not g.game_over:
-            m = model_function[g.current_player](g.field,model[g.current_player])
-            if g.is_moveLegal(m):
-                g.make_move(m)
-                (g.game_over ,WINNER) = g.eval_game()
-                if not g.game_over:
-                    g.swap_player()
-            else:
-                print("Illegal move!")
-        return WINNER
 
-    @staticmethod
-    def calc_AVGFitness(genomes):
-        Neat_Train.averageFitness = 0
+    def calc_AVGFitness(self,genomes):
+        self.averageFitness = 0
         for genome_id, genome in genomes:
-            Neat_Train.averageFitness += genome.fitness
-        Neat_Train.averageFitness = Neat_Train.averageFitness / len(genomes)
+            self.averageFitness += genome.fitness
+        self.averageFitness = self.averageFitness / len(genomes)
 
-    @staticmethod
-    def fitness(genomes,config):
+    def fitness(self,genomes,config):
         for genome_id, genome in genomes:
             genome.fitness = 0
         for genome_id, genome in genomes:
@@ -58,39 +43,44 @@ class Neat_Train():
                 if not opponent_id == genome_id:
                     opp_net = neat.nn.FeedForwardNetwork.create(genome,config)
                     for i in range(10):
-                        move_func = Neat_Train.get_NNMove
-                        winner = Neat_Train.match([move_func,move_func],[net,opp_net])
+                        move_func = self.get_NNMove
+                        winner = self.match([move_func,move_func],[net,opp_net])
                         if winner ==  'X':
                             genome.fitness+=1
                         elif winner == 'O':
                             opponent_genome.fitness+=1
-        Neat_Train.calc_AVGFitness(genomes)
+        self.calc_AVGFitness(genomes)
 
 
-
-    def score_match(self,model):
-        g = self.game_TTT
+    def match(self,model_functions:list,models:list,start_random=False):
+        g = self.gameTTT # or TTT()
         g.reset()
-        g.field[random.randrange(0,9)] = [g.PLAYER_SIGNS[0]]
-        g.current_player = 1
+        if start_random:
+            g.field[random.randrange(0,9)] = [g.PLAYER_SIGNS[0]]
+            g.current_player = 1
         while not g.game_over:
-            if g.current_player == 0:
-                m = g.get_NNMove()
-            else:
-                m = Neat_Train.get_NNMove(g.field,model)
+            m = Neat_Train.get_Move(g,model_functions,models)
             if g.is_moveLegal(m):
                 g.make_move(m)
                 (g.game_over ,WINNER) = g.eval_game()
                 if not g.game_over:
-                    g.swap_player()
+                    g.nextPlayer()
             else:
                 print("Illegal move!")
         return WINNER
 
+    def get_Move(g,model_functions:list,models:list):
+        if model_functions[g.current_player] == g.get_NNMove:
+            return model_functions[g.current_player]()
+        else:
+            return model_functions[g.current_player](g.field,models[g.current_player])
+    
+
+
     def genome_vs_Supervised(self,genome_net,total=100):
         losses = 0
         for i in range(total):
-            winner = self.score_match(genome_net)
+            winner = self.match([self.gameTTT.get_NNMove,Neat_Train.get_NNMove],[None,genome_net],start_random=True)
             if winner ==  'X':
                 losses+=1
         print("genome lost: ",losses," matches out of", 

@@ -20,7 +20,6 @@ class Test_TrainEVNN(unittest.TestCase):
     def test_continue_training(self):
         self.test_object.continue_training(self.checkpoints+str(0))
 
-    
 
 if __name__ == '__main__': 
     unittest.main()

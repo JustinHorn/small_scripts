@@ -14,13 +14,13 @@ class Test_TTT(unittest.TestCase):
         for i in range(9):
             ttt.make_move(0)
             self.assertEqual(ttt.field[0],ttt.PLAYER_SIGNS[ttt.current_player])
-            ttt.swap_player()
+            ttt.nextPlayer()
 
     def test_evalGame(self):
         ttt = TTT()
         for i in range(7):
             ttt.make_move(i)
-            ttt.swap_player()
+            ttt.nextPlayer()
             if i < 6:
                 self.assertEqual(ttt.eval_game()[0],False)
             else:

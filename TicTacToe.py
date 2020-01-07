@@ -45,7 +45,7 @@ class TTT():
                 self.make_move(m)
                 (self.game_over ,WINNER) = self.eval_game()
                 if not self.game_over:
-                    self.swap_player()
+                    self.nextPlayer()
             else:
                 print("Illegal move!")
         if show:
@@ -102,7 +102,7 @@ class TTT():
                 return False,self.EMPTY
         return True,self.EMPTY
 
-    def swap_player(self):
+    def nextPlayer(self):
         self.current_player = 1 if self.current_player == 0 else 0;
 
     def send_endMessage(self,WINNER):
