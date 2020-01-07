@@ -52,23 +52,6 @@ class Neat_Train():
                             opponent_genome.fitness+=1
         self.calc_AVGFitness(genomes)
 
-    def match(self,model_functions:list,start_random=False):
-        g = self.gameTTT # or TTT()
-        g.reset()
-        if start_random:
-            g.field[random.randrange(0,9)] = [g.PLAYER_SIGNS[0]]
-            g.current_player = 1
-        while not g.game_over:
-            m = model_functions[g.current_player](g.field)
-            if g.is_moveLegal(m):
-                g.make_move(m)
-                (g.game_over ,WINNER) = g.eval_game()
-                if not g.game_over:
-                    g.nextPlayer()
-            else:
-                print("Illegal move!")
-        return WINNER
-
 
     def genome_vs_Supervised(self,genome_net,total=100):
         losses = 0
