@@ -5,7 +5,6 @@ from trainEVNN import *
 class Test_TrainEVNN(unittest.TestCase):
 
     checkpoints = "NEAT_Files\\neat-checkpoint-"
-    config_location = "NEAT_Files\\neat-config.txt"
     config = neat.config.Config(neat.DefaultGenome,neat.DefaultReproduction
     ,neat.DefaultSpeciesSet,neat.DefaultStagnation
     ,config_location)
@@ -15,7 +14,7 @@ class Test_TrainEVNN(unittest.TestCase):
         pass
 
     def test_run(self):
-        self.test_object.run(self.config_location)
+        self.test_object.start("neat-config.txt")
 
     def test_continue_training(self):
         self.test_object.continue_training(self.checkpoints+str(0))

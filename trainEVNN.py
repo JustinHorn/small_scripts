@@ -8,15 +8,15 @@ from TicTacToe import *
 
 class Neat_Train():
     gameTTT = TTT()
-
     averageFitness=0
 
-    def __init__(self,generations=101,gen_intervall = 97,dir="NEAT_Files\\",showGraphics=False):
+    def __init__(self,
+    generations=101,gen_intervall = 97,dir="NEAT_Files\\",showGraphics=False):
         self.generations = generations
         self.gen_intervall = gen_intervall
         self.dir = dir
         self.showGraphics = showGraphics
-
+        
     @staticmethod
     def get_NNMove(field,model): ## needs improvement!
         inputVector = TTT.fieldToVector(field)
@@ -26,7 +26,6 @@ class Neat_Train():
             moveVector[m] = -99999999.0
             m = TTT.vectorToMove( moveVector)
         return m         
-
 
     def calc_AVGFitness(self,genomes):
         self.averageFitness = 0
@@ -51,7 +50,6 @@ class Neat_Train():
                             opponent_genome.fitness+=1
         self.calc_AVGFitness(genomes)
 
-
     def match(self,model_functions:list,models:list,start_random=False):
         g = self.gameTTT # or TTT()
         g.reset()
@@ -74,8 +72,6 @@ class Neat_Train():
             return model_functions[g.current_player]()
         else:
             return model_functions[g.current_player](g.field,models[g.current_player])
-    
-
 
     def genome_vs_Supervised(self,genome_net,total=100):
         losses = 0
@@ -114,13 +110,9 @@ class Neat_Train():
             visualize.plot_stats(stats, ylog=False, view=True,filename=self.dir+"avg_fitness.svg")
             visualize.plot_species(stats, view=True,filename=self.dir+"speciation.svg")
 
+    def run(self,configName):
 
-    def run(self,file_path):
-        config = neat.config.Config(neat.DefaultGenome,neat.DefaultReproduction
-        ,neat.DefaultSpeciesSet,neat.DefaultStagnation
-        ,file_path)
-
-        p = neat.population.Population(config)
+        p = neat.population.Population(self.dir+configName)
         self.train_population(p)
 
     def check_out_population(self,p):  
