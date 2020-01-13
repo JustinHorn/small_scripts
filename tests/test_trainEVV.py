@@ -1,6 +1,9 @@
 import unittest
 import neat
+import sys
+sys.path.append(".")
 from trainEVNN import *
+
 
 class Test_TrainEVNN(unittest.TestCase):
 

@@ -1,6 +1,10 @@
 import unittest
+import sys
+sys.path.append(".")
+
 from TicTacToe import TTT
 import random
+
 
 class Test_TTT(unittest.TestCase):
 
